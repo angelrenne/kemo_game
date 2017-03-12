@@ -1,5 +1,5 @@
 //=============================================================================
-// rpg_windows.js
+// rpg_windows.js v1.3.3
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -1750,7 +1750,7 @@ Window_MenuStatus.prototype.drawItemImage = function(index) {
     var actor = $gameParty.members()[index];
     var rect = this.itemRect(index);
     this.changePaintOpacity(actor.isBattleMember());
-    this.drawActorFace(actor, rect.x + 1, rect.y + 1, 144, rect.height - 2);
+    this.drawActorFace(actor, rect.x + 1, rect.y + 1, Window_Base._faceWidth, Window_Base._faceHeight);
     this.changePaintOpacity(true);
 };
 
@@ -4703,11 +4703,11 @@ Window_MapName.prototype.close = function() {
 
 Window_MapName.prototype.refresh = function() {
     this.contents.clear();
-    //if ($gameMap.displayName()) {
-    //    var width = this.contentsWidth();
-    //    this.drawBackground(0, 0, width, this.lineHeight());
-    //    this.drawText($gameMap.displayName(), 0, 0, width, 'center');
-    //}
+    if ($gameMap.displayName()) {
+        var width = this.contentsWidth();
+        this.drawBackground(0, 0, width, this.lineHeight());
+        this.drawText($gameMap.displayName(), 0, 0, width, 'center');
+    }
 };
 
 Window_MapName.prototype.drawBackground = function(x, y, width, height) {
@@ -4735,7 +4735,6 @@ Window_BattleLog.prototype.initialize = function() {
     var height = this.windowHeight();
     Window_Selectable.prototype.initialize.call(this, 0, 0, width, height);
     this.opacity = 0;
-    this.y = -12
     this._lines = [];
     this._methods = [];
     this._waitCount = 0;
@@ -5391,7 +5390,6 @@ Window_ActorCommand.prototype.addAttackCommand = function() {
 
 Window_ActorCommand.prototype.addSkillCommands = function() {
     var skillTypes = this._actor.addedSkillTypes();
-    console.log(this._actor)
     skillTypes.sort(function(a, b) {
         return a - b;
     });
@@ -5433,7 +5431,14 @@ Window_ActorCommand.prototype.processOk = function() {
 Window_ActorCommand.prototype.selectLast = function() {
     this.select(0);
     if (this._actor && ConfigManager.commandRemember) {
-        this.selectSymbol(this._actor.lastCommandSymbol());
+        var symbol = this._actor.lastCommandSymbol();
+        this.selectSymbol(symbol);
+        if (symbol === 'skill') {
+            var skill = this._actor.lastBattleSkill();
+            if (skill) {
+                this.selectExt(skill.stypeId);
+            }
+        }
     }
 };
 

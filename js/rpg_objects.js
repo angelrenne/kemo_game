@@ -1,5 +1,5 @@
 //=============================================================================
-// rpg_objects.js
+// rpg_objects.js v1.3.3
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -1089,7 +1089,7 @@ Game_Picture.prototype.updateTone = function() {
 };
 
 Game_Picture.prototype.updateRotation = function() {
-    if (this._rotationSpeed > 0) {
+    if (this._rotationSpeed !== 0) {
         this._angle += this._rotationSpeed / 2;
     }
 };
@@ -1406,7 +1406,7 @@ Game_Action.prototype.decideRandomTarget = function() {
         target = this.opponentsUnit().randomTarget();
     }
     if (target) {
-        this._targetIndex = target.index;
+        this._targetIndex = target.index();
     } else {
         this.clear();
     }
@@ -1528,7 +1528,7 @@ Game_Action.prototype.evaluate = function() {
             value += targetValue;
         } else if (targetValue > value) {
             value = targetValue;
-            this._targetIndex = target.index;
+            this._targetIndex = target.index();
         }
     }, this);
     value *= this.numRepeats();
@@ -1692,7 +1692,9 @@ Game_Action.prototype.evalDamageFormula = function(target) {
         var b = target;
         var v = $gameVariables._data;
         var sign = ([3, 4].contains(item.damage.type) ? -1 : 1);
-        return Math.max(eval(item.damage.formula), 0) * sign;
+        var value = Math.max(eval(item.damage.formula), 0) * sign;
+		if (isNaN(value)) value = 0;
+		return value;
     } catch (e) {
         return 0;
     }
@@ -1768,13 +1770,21 @@ Game_Action.prototype.executeMpDamage = function(target, value) {
 
 Game_Action.prototype.gainDrainedHp = function(value) {
     if (this.isDrain()) {
-        this.subject().gainHp(value);
+       var gainTarget = this.subject();
+       if (this._reflectionTarget !== undefined) {
+            gainTarget = this._reflectionTarget;
+        }
+       gainTarget.gainHp(value);
     }
 };
 
 Game_Action.prototype.gainDrainedMp = function(value) {
     if (this.isDrain()) {
-        this.subject().gainMp(value);
+       var gainTarget = this.subject();
+       if (this._reflectionTarget !== undefined) {
+           gainTarget = this._reflectionTarget;
+       }
+       gainTarget.gainMp(value);
     }
 };
 
@@ -2619,7 +2629,7 @@ Game_BattlerBase.prototype.mpRate = function() {
 };
 
 Game_BattlerBase.prototype.tpRate = function() {
-    return this.tp / 100;
+    return this.tp / this.maxTp();
 };
 
 Game_BattlerBase.prototype.hide = function() {
@@ -3948,7 +3958,7 @@ Game_Actor.prototype.forgetSkill = function(skillId) {
 };
 
 Game_Actor.prototype.isLearnedSkill = function(skillId) {
-    return this._skills.contains(skillId);
+    return this._skills.contains(skillId) || this.addedSkills().contains(skillId);
 };
 
 Game_Actor.prototype.changeClass = function(classId, keepExp) {
@@ -8258,7 +8268,6 @@ Game_Vehicle.prototype.pos = function(x, y) {
 };
 
 Game_Vehicle.prototype.isMapPassable = function(x, y, d) {
-    console.log("")
     var x2 = $gameMap.roundXWithDirection(x, d);
     var y2 = $gameMap.roundYWithDirection(y, d);
     if (this.isBoat()) {
@@ -9265,7 +9274,6 @@ Game_Interpreter.prototype.command111 = function() {
         break;
     case 10:  // Armor
         result = $gameParty.hasItem($dataArmors[this._params[1]], this._params[2]);
-        console.log($gameParty.hasItem($dataArmors[this._params[1]], this._params[2]));
         break;
     case 11:  // Button
         result = Input.isPressed(this._params[1]);
@@ -9276,7 +9284,6 @@ Game_Interpreter.prototype.command111 = function() {
     case 13:  // Vehicle
         result = ($gamePlayer.vehicle() === $gameMap.vehicle(this._params[1]));
         break;
-        console.log
     }
     this._branch[this._indent] = result;
     if (this._branch[this._indent] === false) {
@@ -10259,7 +10266,7 @@ Game_Interpreter.prototype.command320 = function() {
 Game_Interpreter.prototype.command321 = function() {
     var actor = $gameActors.actor(this._params[0]);
     if (actor && $dataClasses[this._params[1]]) {
-        actor.changeClass(this._params[1], false);
+        actor.changeClass(this._params[1], this._params[2]);
     }
     return true;
 };
@@ -10375,11 +10382,19 @@ Game_Interpreter.prototype.command336 = function() {
 
 // Show Battle Animation
 Game_Interpreter.prototype.command337 = function() {
-    this.iterateEnemyIndex(this._params[0], function(enemy) {
-        if (enemy.isAlive()) {
-            enemy.startAnimation(this._params[1], false, 0);
-        }
-    }.bind(this));
+    if (this._params[2] == true) {
+        this.iterateEnemyIndex(-1,function(enemy) {
+            if (enemy.isAlive()) {
+                enemy.startAnimation(this._params[1],false,0);
+            }
+        }.bind(this));
+    } else {
+        this.iterateEnemyIndex(this._params[0], function (enemy) {
+            if (enemy.isAlive()) {
+                enemy.startAnimation(this._params[1], false, 0);
+            }
+        }.bind(this));
+    }
     return true;
 };
 
