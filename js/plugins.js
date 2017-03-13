@@ -13,5 +13,6 @@ var $plugins =
 {"name":"TMEventClick","status":true,"description":"イベントをクリックして起動、ドラッグで移動させる機能を\n追加します。","parameters":{"dropStart":"0","noDropRegions":"","canMultipleDrop":"0","lockTurnEnabled":"0"}},
 {"name":"ALICE_reversal_eventidXy","status":true,"description":"指定位置の情報取得を反転したバージョン","parameters":{}},
 {"name":"DevToolsManage","status":true,"description":"デベロッパツール管理プラグイン","parameters":{"開始時に起動":"ON","常に前面表示":"OFF","デベロッパツール表示位置":"0,0,800,600","最小化切替キー":"F8","リロードキー":"F12","画面の左寄せキー":"F11","高速化切替キー":"F10","強制戦闘勝利キー":"F7","FPS表示":"OFF","タイトルカット":"OFF","高速開始":"OFF"}},
-{"name":"CharacterPopupDamage","status":true,"description":"キャラクターのダメージポッププラグイン","parameters":{"効果音演奏":"ON","X座標補正":"0","Y座標補正":"0","HP自動ポップアップ":"ON","MP自動ポップアップ":"ON","TP自動ポップアップ":"ON","増加自動ポップアップ":"ON","減少自動ポップアップ":"ON","MPダメージ音":"","回転":"OFF","X方向半径":"0","Y方向半径":"40","回転速度":"60","拡大率":"100","拡大率変化値":"0","最前面表示":"ON"}}
+{"name":"CharacterPopupDamage","status":true,"description":"キャラクターのダメージポッププラグイン","parameters":{"効果音演奏":"ON","X座標補正":"0","Y座標補正":"0","HP自動ポップアップ":"ON","MP自動ポップアップ":"ON","TP自動ポップアップ":"ON","増加自動ポップアップ":"ON","減少自動ポップアップ":"ON","MPダメージ音":"","回転":"OFF","X方向半径":"0","Y方向半径":"40","回転速度":"60","拡大率":"100","拡大率変化値":"0","最前面表示":"ON"}},
+{"name":"Exhydra_CharacterExtras","status":true,"description":"Options to apply various properties to characters and events.","parameters":{}}
 ];
